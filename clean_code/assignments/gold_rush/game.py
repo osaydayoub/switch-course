@@ -3,10 +3,13 @@ import random
 
 
 class GoldRush(Matrix):
-    MAX_SCORE = 100
+    WINNING_SCORE = 100
     COIN = "$"
     WALL = "wall"
     EMPTY_SPACE = "."
+    FIRST_PLAYER = "player1"
+    SECOND_PLAYER = "player2"
+    MIN_COINS = 10
 
 
     def __init__(self, rows, cols):
@@ -16,13 +19,10 @@ class GoldRush(Matrix):
         self.winner = ""
         self.coins = 0
     
-    def _is_empty_board(self):
+    def _is_zero_sized_board(self):
         return self.rows == 0 and self.cols == 0
     
-    def _init_empty_board(self):
-        self.matrix = []
-
-    def _init_board_structure(self):
+    def _init_board(self):
         self.matrix = []
         for _ in range(self.rows):
             self.matrix.append([])
@@ -63,18 +63,18 @@ class GoldRush(Matrix):
         return coins
     
     def _place_players(self):
-        self.matrix[0][0] = "player1"
-        self.matrix[self.rows - 1][self.cols - 1] = "player2"
+        self.matrix[0][0] = GoldRush.FIRST_PLAYER
+        self.matrix[self.rows - 1][self.cols - 1] = GoldRush.SECOND_PLAYER
 
     def load_board(self):
-        if self._is_empty_board():
-            self._init_empty_board()
+        if self._is_zero_sized_board():
+            self.matrix = []
             return
-        self._init_board_structure()
+        self._init_board()
         coins = self._populate_board()
         self._place_players()
         self.coins = coins  
-        if coins < 10:
+        if coins < GoldRush.MIN_COINS:
             return self.load_board()
         else:
             return self.matrix
@@ -83,17 +83,17 @@ class GoldRush(Matrix):
     def _check_winner(self, player):
         player_num = player[-1]
         score = getattr(self, f"player{player_num}_score")
-        if score == GoldRush.MAX_SCORE:
+        if score == GoldRush.WINNING_SCORE:
             self.winner = player
             return self.winner
 
     def _check_other_player(self, player):
         otherPlayer = None
-        if player == "player1":
-            otherPlayer = "player2"
+        if player == GoldRush.FIRST_PLAYER:
+            otherPlayer = GoldRush.SECOND_PLAYER
             return otherPlayer
-        elif player == "player2":
-            otherPlayer = "player1"
+        elif player == GoldRush.SECOND_PLAYER:
+            otherPlayer = GoldRush.FIRST_PLAYER
             return otherPlayer
         
 
